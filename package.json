@@ -1,14 +1,23 @@
 {
   "scripts": {
-    "start": "micro"
+    "start": "micro",
+    "deploy": "yarn now rm zlatyfond-txt && yarn now --public && yarn now alias zlatyfond-txt"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
     "feedparser": "^2.2.9",
     "micro": "latest",
-    "node-fetch": "^2.1.2"
+    "node-fetch": "^2.1.2",
+    "slug": "^0.9.1"
   },
   "devDependencies": {
     "now": "^10.2.1"
-  }
+  },
+  "name": "zlatyfond-txt",
+  "version": "1.0.0",
+  "description": "zlatyfond-txt.now.sh - view zlatyfond.sme.sk on kindle",
+  "main": "index.js",
+  "repository": "git@github.com:pomali/zlatyfond-txt.git",
+  "author": "pom",
+  "license": "MIT"
 }

@@ -2,6 +2,8 @@ const fetch = require('node-fetch')
 const url = require('url')
 const FeedParser = require('feedparser')
 const cheerio = require('cheerio')
+const slug = require('slug')
+
 
 
 
@@ -50,20 +52,17 @@ const indexRoute = async () =>
         </head>
         <body><ul>`
       out += books.map(
-        b => `<li><a href="/?url=${encodeURIComponent(b.url)}">${b.title}</a></li>`
+        b => `<li><a href="/?url=${encodeURIComponent(b.url)}" download="${slug(b.title)}.txt">${b.title}</a></li>`
       ).join('')
 
       out += "</ul></body></html>"
       return out
     })
 
-const fetchRoute = async (bookUrl) => {
+const fetchRoute = async (request, response, bookUrl) => {
   return fetch(bookUrl)
     .then( 
-      x => {
-        //console.log(x)
-        return x.text()
-      }, 
+      x => x.text(),
       res => console.error(res)
     )
     .then( html => {
@@ -71,8 +70,12 @@ const fetchRoute = async (bookUrl) => {
       const reg = (x) => x.split('\n').map(x => x.trim()).join('\n')
       const nadpis = reg($.find('h2').text())
       const text = reg($.find('.chapter').text())
+      response.setHeader('Content-Type', 'text/plain; charset=utf8')
+      response.setHeader('Content-Disposition', `attachment; filename="${slug(nadpis)}.txt"`)
       return `
       ${nadpis}
+
+
       ${text}
       `
     }).catch(e => console.error(e))
@@ -84,8 +87,7 @@ module.exports = async (request, response) => {
   console.log(request.url, reqUrl, query)
   if (query && query.url){
     const bookUrl = query.url
-    response.setHeader('Content-Type', 'text/plain; charset=utf8')
-    return fetchRoute(bookUrl)
+    return fetchRoute(request, response, bookUrl)
   } if (reqUrl.path == '/favicon.ico' ){
     return null
   }else {
